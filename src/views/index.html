@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>IdeaBoard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+
+<body>
+    <!-- Modal Structure -->
+    <div id="modal1" class="modal">
+        <div class="modal-content">
+            <h4>Create board</h4>
+            <form>
+
+            
+            <div class="input-field">
+                <input placeholder="Board title" id="board_title" type="text">
+                <label for="board_title">Board title</label>
+            </div>
+            <div class="chips chips-placeholder"></div>
+            <div class="input-field">
+                <input placeholder="First name" id="first_name" type="text">
+                <label for="first_name">First name</label>
+            </div>
+            <div class="input-field">
+                <input placeholder="Last name" id="last_name" type="text">
+                <label for="last_name">Last name</label>
+            </div>
+            <div class="input-field">
+                <input placeholder="Age" id="age" type="text">
+                <label for="age">Age</label>
+            </div>
+        </form>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Create</a>
+        </div>
+    </div>
+
+    <a class="waves-effect waves-light btn modal-trigger" href="#modal1">
+        Create <i class="material-icons right">create</i>
+    </a>
+
+
+    <div id="app">
+        <div class="container board-container">
+            <div style="text-align: center; margin-bottom: 120px;" class="title">
+                {{title}}
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-evenly;" class="subboards">
+
+                <div v-for="subboard in subboards"
+                    style="display: flex; justify-content: space-evenly; height: 50vh; flex-direction: column;"
+                    class="subboard">
+                    <div style="text-align: center; margin-bottom: 20px;" class="title">
+                        {{subboard.title}}
+                    </div>
+                    <div style="padding: 30px; border: 1px solid green; position: relative;"
+                        v-for="comment in subboard.comments">
+                        {{comment}}
+                        <div style="position: absolute; left: 10px; bottom: 10px; cursor: pointer;" class="plus">
+                            +
+                        </div>
+                        <div style="position: absolute; right: 10px; bottom: 10px;" class="counter">
+                            0
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                title: 'Some boards',
+                subboards: [
+                    {
+                        title: 'the good',
+                        comments: [
+                            'really awesome',
+                            'really cool'
+                        ]
+                    },
+                    {
+                        title: 'the bad',
+                        comments: [
+                            'really bad',
+                            'really not cool'
+                        ]
+                    }
+                ]
+            }
+        })
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+    
+            var elems = document.querySelectorAll('.modal');
+            var instances = M.Modal.init(elems, {
+                onCloseStart: function(a) {
+                    var requestObject = {
+                        boardTitle: document.getElementById('board_title').value,
+                        subBoards: (function() {
+                            var result = [];
+                            var chips = document.querySelectorAll('.chips .chip');
+                            chips.forEach(chip => {
+                                result.push(chip.innerText.replace('close', '').trim());
+                            })
+                            return result;
+                        })(),
+                        firstName: document.getElementById('first_name').value,
+                        lastName: document.getElementById('last_name').value,
+                        age: document.getElementById('age').value
+                    }
+                    fetch('/newboard', {
+                        method: 'POST',
+                        body: JSON.stringify(requestObject),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    }).then(data => data.json()).then(result => console.log(result))
+                    console.log('hi');
+                    console.log(a);
+                    console.log(requestObject);
+                }
+            });
+
+            var elems = document.querySelectorAll('.chips');
+            var instances = M.Chips.init(elems, {
+                placeholder: 'Add sections'
+            });
+     
+        </script>
+</body>
+
+</html>
